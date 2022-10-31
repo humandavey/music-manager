@@ -4,3 +4,4 @@ main: me.relend.musicmanager.MusicManager
 api-version: 1.19
 authors: [ Relend ]
 description: Allows management of noteblock songs
+depend: [ NoteBlockAPI ]

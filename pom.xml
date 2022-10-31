@@ -44,6 +44,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>3.2.2</version>
+              <configuration>
+                <outputDirectory>/home/humandavey/Documents/Minecraft Servers/1.19.2 - TestServer/plugins</outputDirectory>
+              </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -62,6 +70,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -69,6 +81,12 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.19.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.koca2000</groupId>
+            <artifactId>NoteBlockAPI</artifactId>
+            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
