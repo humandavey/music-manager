@@ -3,5 +3,5 @@ version: '${project.version}'
 main: me.relend.musicmanager.MusicManager
 api-version: 1.19
 authors: [ Relend ]
-description: Allows management of noteblock songs
+description: Allows management of noteblock songs in a menu
 depend: [ NoteBlockAPI ]
