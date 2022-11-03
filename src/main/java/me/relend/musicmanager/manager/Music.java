@@ -16,24 +16,29 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class Music implements Listener {
 
-	private final HashMap<String, Song> songs;
+	private final TreeMap<String, Song> songs;
 	private final HashMap<UUID, RadioSongPlayer> nowPlaying;
 	private final HashMap<UUID, ArrayList<Song>> playlists;
 	private final ArrayList<UUID> loop;
 
 	public Music() {
-		songs = new HashMap<>();
+		songs = new TreeMap<>();
 		nowPlaying = new HashMap<>();
 		playlists = new HashMap<>();
 		loop = new ArrayList<>();
 
 		for (File f : new File(MusicManager.getInstance().getDataFolder() + "/songs").listFiles()) {
-			Song s = NBSDecoder.parse(f);
-			songs.put(s.getTitle().toUpperCase(), s);
+			if (f.getName().endsWith(".nbs")) {
+				Song s = NBSDecoder.parse(f);
+				if (s != null) {
+					songs.put(s.getTitle().toUpperCase(), s);
+				}
+			}
 		}
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -45,11 +50,13 @@ public class Music implements Listener {
 		return songs.get(name.toUpperCase());
 	}
 
-	public void setPlaying(Player player, RadioSongPlayer rsp) {
+	public void setPlaying(Player player, RadioSongPlayer rsp, boolean clear) {
 		if (nowPlaying.containsKey(player.getUniqueId()))
 			nowPlaying.get(player.getUniqueId()).destroy();
 		nowPlaying.remove(player.getUniqueId());
 		nowPlaying.put(player.getUniqueId(), rsp);
+		if (clear)
+			playlists.get(player.getUniqueId()).clear();
 		playlists.get(player.getUniqueId()).add(rsp.getSong());
 		rsp.addPlayer(player);
 		rsp.setPlaying(true);
@@ -120,10 +127,17 @@ public class Music implements Listener {
 	}
 
 	public void restartSong(Player player) {
-		setPlaying(player, new RadioSongPlayer(getPlaying(player).getSong()));
+		RadioSongPlayer rsp = new RadioSongPlayer(getPlaying(player).getSong());
+		if (nowPlaying.containsKey(player.getUniqueId()))
+			nowPlaying.get(player.getUniqueId()).destroy();
+		nowPlaying.remove(player.getUniqueId());
+		nowPlaying.put(player.getUniqueId(), rsp);
+		rsp.addPlayer(player);
+		rsp.setPlaying(true);
 	}
 
 	public boolean hasNext(Player player) {
+		if (playlists.get(player.getUniqueId()) == null || playlists.get(player.getUniqueId()).size() == 0) return false;
 		return playlists.get(player.getUniqueId()).indexOf(getPlaying(player).getSong()) + 1 < playlists.get(player.getUniqueId()).size();
 	}
 
@@ -134,7 +148,13 @@ public class Music implements Listener {
 	public void lastSong(Player player) {
 		if (hasLast(player)) {
 			Song song = playlists.get(player.getUniqueId()).get(playlists.get(player.getUniqueId()).indexOf(getPlaying(player).getSong()) - 1);
-			setPlaying(player, new RadioSongPlayer(song));
+			if (nowPlaying.containsKey(player.getUniqueId()))
+				nowPlaying.get(player.getUniqueId()).destroy();
+			RadioSongPlayer rsp = new RadioSongPlayer(song);
+			nowPlaying.remove(player.getUniqueId());
+			nowPlaying.put(player.getUniqueId(), rsp);
+			rsp.addPlayer(player);
+			rsp.setPlaying(true);
 		}
 	}
 
@@ -142,7 +162,7 @@ public class Music implements Listener {
 		return nowPlaying.get(player.getUniqueId());
 	}
 
-	public HashMap<String, Song> getSongs() {
+	public TreeMap<String, Song> getSongs() {
 		return songs;
 	}
 
@@ -172,13 +192,13 @@ public class Music implements Listener {
 		Player player = Bukkit.getPlayer(UUID.fromString(event.getSongPlayer().getPlayerUUIDs().toArray()[0].toString()));
 		if (playlists.get(player.getUniqueId()).indexOf(event.getSongPlayer().getSong()) + 1 < playlists.get(player.getUniqueId()).size()) {
 			Song song = playlists.get(player.getUniqueId()).get(playlists.get(player.getUniqueId()).indexOf(event.getSongPlayer().getSong()) + 1);
-			setPlaying(player, new RadioSongPlayer(song));
+			setPlaying(player, new RadioSongPlayer(song), false);
 			player.sendMessage(Util.colorize("&aNow playing &2" + song.getTitle() + " &aby &2" + song.getOriginalAuthor() + "&a!"));
 			return;
 		}
 		if (isLoop(player)) {
 			Song song = playlists.get(player.getUniqueId()).get(0);
-			setPlaying(player, new RadioSongPlayer(song));
+			setPlaying(player, new RadioSongPlayer(song), false);
 			player.sendMessage(Util.colorize("&aNow playing &2" + song.getTitle() + " &aby &2" + song.getOriginalAuthor() + "&a!"));
 			return;
 		}

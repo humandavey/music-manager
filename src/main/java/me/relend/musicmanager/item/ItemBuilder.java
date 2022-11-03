@@ -60,6 +60,11 @@ public class ItemBuilder {
 		return this;
 	}
 
+	public ItemBuilder setLocalizedName(String localizedName) {
+		meta.setLocalizedName(localizedName);
+		return this;
+	}
+
 	public ItemBuilder setLore(List<String> lore) {
 		meta.setLore(lore);
 		return this;

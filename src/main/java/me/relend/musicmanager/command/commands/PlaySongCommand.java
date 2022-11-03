@@ -12,6 +12,6 @@ public class PlaySongCommand extends Command {
 
 	@Override
 	public void execute(Player player, String[] args) {
-		new SongMenu().open(player);
+		new SongMenu(player, 1);
 	}
 }
