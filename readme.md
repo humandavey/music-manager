@@ -11,6 +11,9 @@ Music Manager is a spigot plugin that allows server owners to add songs that the
 - Nice menu with infinite slots for songs
 - Paged menu
 
+# Dependencies
+Requires [NoteBlockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/) to work!
+
 ## Authors
 
 - [@humandavey](https://www.github.com/humandavey)
