@@ -2,10 +2,12 @@ package me.relend.musicmanager;
 
 import me.relend.musicmanager.command.commands.PlaySongCommand;
 import me.relend.musicmanager.listener.MusicListener;
-import me.relend.musicmanager.manager.Music;
 import me.relend.musicmanager.listener.PageListener;
+import me.relend.musicmanager.manager.Music;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 
 public final class MusicManager extends JavaPlugin {
 	private static MusicManager instance;
@@ -15,7 +17,12 @@ public final class MusicManager extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 
-		setup();
+		if (Bukkit.getPluginManager().isPluginEnabled("NoteBlockAPI")) {
+			setup();
+		} else {
+			getLogger().severe("Couldn't find NoteBlockAPI! Disabling...");
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
 	}
 
 	@Override
@@ -33,10 +40,11 @@ public final class MusicManager extends JavaPlugin {
 	private void setupConfig() {
 		if (!this.getDataFolder().exists()) this.getDataFolder().mkdir();
 
+		if (!new File(getDataFolder(), "songs").exists()) new File(getDataFolder(), "songs").mkdirs();
+
 		getConfig().options().copyDefaults();
 		saveDefaultConfig();
 	}
-
 
 	private void setupManagers() {
 		music = new Music();
@@ -51,7 +59,6 @@ public final class MusicManager extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new MusicListener(), this);
 		getServer().getPluginManager().registerEvents(music, this);
 	}
-
 
 	public Music getMusic() {
 		return music;

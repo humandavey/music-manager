@@ -14,10 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class Music implements Listener {
 
@@ -32,11 +29,14 @@ public class Music implements Listener {
 		playlists = new HashMap<>();
 		loop = new ArrayList<>();
 
-		for (File f : new File(MusicManager.getInstance().getDataFolder() + "/songs").listFiles()) {
-			if (f.getName().endsWith(".nbs")) {
-				Song s = NBSDecoder.parse(f);
-				if (s != null) {
-					songs.put(s.getTitle().toUpperCase(), s);
+		File songsFolder = new File(MusicManager.getInstance().getDataFolder() + "/songs");
+		if (songsFolder.listFiles() != null && songsFolder.listFiles().length > 0) {
+			for (File f : Objects.requireNonNull(songsFolder.listFiles())) {
+				if (f.getName().endsWith(".nbs")) {
+					Song s = NBSDecoder.parse(f);
+					if (s != null) {
+						songs.put(s.getTitle().toUpperCase(), s);
+					}
 				}
 			}
 		}
